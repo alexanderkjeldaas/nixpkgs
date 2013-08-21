@@ -1,0 +1,11 @@
+History of 3rd_gen_i5_i7_RACM-SINIT
+==============================
+
+v67:
+    -  Security update for July 2013 Security Advisory ID: INTEL-SA-0035 (www.intel.com/security)
+    -  Revocation ACM (RACM) to revoke 3rd gen and/or 2nd gen SINIT ACM version 51 or lower. 
+    -  RACM should only be run on 2nd gen based platforms if using 3rd gen SINIT version 51 or lower.
+    -  Revocation is permanent, make sure to have 3rd gen SINIT v67 or higher prior to running RACM.
+    -  No changes in v01 - v66, aligning version number to ACM hex version number 
+
+

@@ -1,0 +1,18 @@
+History of 3rd_gen_i5_i7-SINIT
+==============================
+
+v67:
+    -  Security update for July 2013 Security Advisory ID: INTEL-SA-0035 (www.intel.com/security)
+    -  3rd gen SINIT is also compatible with 2nd gen platforms, however platform requires latest BIOS reference code
+    -  No changes in v52 - v66, aligning version number to ACM hex version number 
+
+v51:
+    -  Initial release
+    -  Support for v2.2 of Launch Control Policy
+    -  Added support for OsSinitData v6
+    -  Supports new AUX Index (0x50000003)
+    -  Uses ACM Version 0x33, CPUACMVersion=1, 
+    -  Uses SinitMleData v8, MLE Header v2
+    -  Uses Chipset ACM Information Table v4
+    -  Enforces that LCP Data blobs must reside in DMA-protected memory
+    -  Returns MLE page table base addr in ECX after SENTER
