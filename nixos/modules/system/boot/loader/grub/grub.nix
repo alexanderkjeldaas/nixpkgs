@@ -120,7 +120,7 @@ in
         };
 
         tbootParams = mkOption {
-          default = "logging=serial,vga,memory vga_delay=10";
+          default = "logging=serial,vga,memory vga_delay=1";
           description = ''
             Parameters given to tboot, the Intel TXT trusted boot.
           '';
@@ -353,7 +353,7 @@ in
       # set at once.
       system.boot.loader.id = "grub";
 
-      environment.systemPackages = optional (grub != null) grub;
+      environment.systemPackages = optional (grub != null) grub ++ optional cfg.trustedBoot.enable [ pkgs.tboot pkgs.tpm-tools ];
 
       boot.loader.grub.extraPrepareConfig =
         concatStrings (mapAttrsToList (n: v: ''
