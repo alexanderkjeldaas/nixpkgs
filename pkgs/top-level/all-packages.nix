@@ -2054,6 +2054,8 @@ let
 
   torsocks = callPackage ../tools/security/tor/torsocks.nix { };
 
+  tpm-quote-tools = callPackage ../tools/security/tpm-quote-tools { };
+
   tpm-tools = callPackage ../tools/security/tpm-tools { };
 
   trickle = callPackage ../tools/networking/trickle {};
