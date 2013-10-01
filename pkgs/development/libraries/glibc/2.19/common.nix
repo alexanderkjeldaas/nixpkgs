@@ -78,6 +78,15 @@ stdenv.mkDerivation ({
     echo "LDFLAGS-nscd += -static-libgcc" >> nscd/Makefile
   '';
 
+  
+  preConfigure = ''
+      # The bootstrap binutils might or might not be compiled
+      # with deterministic archives as default.  We assume
+      # nothing
+      export ARFLAGS=rD
+      export CREATE_ARFLAGS=crD
+  '';
+
   configureFlags =
     [ "-C"
       "--enable-add-ons"
