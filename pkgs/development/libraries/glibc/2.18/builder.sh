@@ -14,6 +14,30 @@ postConfigure() {
     unset CFLAGS
 }
 
+filterArchives() {
+    # Remove dates in all libraries
+    for a in $out/lib*/lib*.a; do
+        echo "Cleaning out dates in archive $a..."
+	mkdir -p $out/tmpzz
+        (
+          #sha256sum $a
+          ls -i $a
+          cd $out/tmpzz &&
+          ar x $a &&
+          F=$(ar t $a) &&
+          ar tv $a &&
+          rm -f $a &&
+          ar crD $a $F &&
+          cp $a $a.asdf &&
+          ar tv $a || true
+          #sha256sum $a $a.asdf 
+          ls -i $a $a.asdf || true
+        )
+        rm -rf $out/tmpzz
+    done
+}
+
+
 
 postInstall() {
     if test -n "$installLocales"; then
@@ -52,6 +76,13 @@ postInstall() {
 
     # Get rid of more unnecessary stuff.
     rm -rf $out/var $out/sbin/sln
+    filterArchives
+    set -x
+}
+
+postFixup() {
+    echo In postFixup
+    filterArchives
 }
 
 genericBuild

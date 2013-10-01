@@ -76,6 +76,7 @@ in
   (if cross != null
    then {
       preConfigure = ''
+        $preConfigure
         sed -i s/-lgcc_eh//g "../$sourceRoot/Makeconfig"
 
         cat > config.cache << "EOF"
