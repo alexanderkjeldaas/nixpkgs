@@ -14,6 +14,22 @@ postConfigure() {
     unset CFLAGS
 }
 
+filterArchives() {
+    for a in $out/lib*/lib*.a; do
+        # libieee.a is not an archive
+        case ${a##*/} in
+          libieee.a|libmcheck.a)
+		;;
+          *)
+		$arClean/bin/ar-clean $a
+		;;
+	esac
+    done
+} 
+
+postFixup() {
+    filterArchives
+}
 
 postInstall() {
     if test -n "$installLocales"; then
@@ -52,6 +68,7 @@ postInstall() {
 
     # Get rid of more unnecessary stuff.
     rm -rf $out/var $out/sbin/sln
+    filterArchives
 }
 
 genericBuild

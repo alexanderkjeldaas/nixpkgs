@@ -15,6 +15,15 @@ let
 
   version = "2.19";
 
+  /* Helper program that zeroes out the mtime in the .a files in order
+     to give us deterministic outputs. */
+  arClean = stdenv.mkDerivation {
+    name = "ar-clean";
+    src = ./ar-clean;
+    buildPhase = "g++ ./ar-clean.cc -o ar-clean";
+    installPhase = "mkdir -p $out/bin; cp ar-clean $out/bin";
+  };
+
 in
 
 assert cross != null -> gccCross != null;
@@ -59,9 +68,11 @@ stdenv.mkDerivation ({
 
       ./fix-math.patch
 
-      /* Remove references to the compilation date.  Also try to create archives using 0-timestamps */
+      /* Remove references to the compilation date. */
       ./glibc-remove-date-from-compilation-banner.patch
     ];
+
+  inherit arClean;
 
   postPatch = ''
     # Needed for glibc to build with the gnumake 3.82
@@ -73,6 +84,7 @@ stdenv.mkDerivation ({
     echo "LDFLAGS-nscd += -static-libgcc" >> nscd/Makefile
   '';
 
+  
   configureFlags =
     [ "-C"
       "--enable-add-ons"
