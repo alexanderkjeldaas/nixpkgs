@@ -10,5 +10,11 @@ stdenv.mkDerivation {
 
   buildInputs = [ trousers openssl zlib ];
 
+  configurePhase = ''
+    for a in lcptools utils tb_polgen; do
+      substituteInPlace $a/Makefile --replace /usr/sbin /sbin
+    done
+    substituteInPlace docs/Makefile --replace /usr/share /share
+  '';
   installFlags = "DESTDIR=$(out)";
 }
