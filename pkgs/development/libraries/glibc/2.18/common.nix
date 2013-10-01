@@ -69,6 +69,9 @@ stdenv.mkDerivation ({
       ./cve-2013-4788.patch
 
       ./strstr-sse42-hack.patch
+
+      /* Remove references to the compilation date.  Also try to create archives using 0-timestamps */
+      ./glibc-remove-date-from-compilation-banner.patch
     ];
 
   postPatch = ''
@@ -79,6 +82,15 @@ stdenv.mkDerivation ({
     # nscd needs libgcc, and we don't want it dynamically linked
     # because we don't want it to depend on bootstrap-tools libs.
     echo "LDFLAGS-nscd += -static-libgcc" >> nscd/Makefile
+  '';
+
+  
+  preConfigure = ''
+      # The bootstrap binutils might or might not be compiled
+      # with deterministic archives as default.  We assume
+      # nothing
+      export ARFLAGS=rD
+      export CREATE_ARFLAGS=crD
   '';
 
   configureFlags =
