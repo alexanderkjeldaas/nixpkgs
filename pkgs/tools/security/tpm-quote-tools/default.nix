@@ -8,5 +8,5 @@ stdenv.mkDerivation {
     sha256 = "17bf9d1hiiaybx6rgl0sqcb0prjz6d2mv8fwp4bj1c0rsfw5dbk8";
   };
 
-  buildInputs = [ trousers ];
+  buildInputs = [ trousers openssl ];
 }
