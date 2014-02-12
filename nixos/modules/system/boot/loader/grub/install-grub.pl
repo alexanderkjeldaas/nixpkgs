@@ -41,7 +41,8 @@ sub generateLcp {
     my ($tboot, $tbootCmd, $public, $private) = @_;
     # Generate public key from private key if needed.
     my (undef, $fn) = tempfile( SUFFIX => '.pem', UNLINK => 1);
-    -e $private || print STDERR "Private key $private does not exist! Create one the command openssl genrsa -out $private 2048";
+    -e $private || print STDERR "Private key $private does not exist!";
+    -e $private || print STDERR "Create one using the command openssl genrsa -out $private 2048";
     if ((! -e $public) && $private) {
 	`openssl rsa -pubout -in $private -out $fn`;
         $public = $fn;
@@ -115,23 +116,26 @@ sub writeTpmNvram {
     # Define LCP and Verified Launch policy indices
     # The nvram index 0x20000001 is hard-coded in tboot
     #`tpm_nvinfo -n | grep -q 0x20000001`;
-    `tpmnv_relindex -i 0x20000001 -p $tpm_pw`;
+    #`tpmnv_relindex -i 0x20000001 -p $tpm_pw`;
+    `tpm_nvrelease -i 0x20000001 -y`;
     print STDERR "Tboot policy index didn't exist in TPM NVRAM\n" if $?;
     print STDERR "Creating tboot policy index in the TPM NVRAM\n";
-        #`tpm_nvdefine -i 0x20000001 -s 512 -p 'OWNERWRITE' -z -y`;
-        `tpmnv_defindex -i 0x20000001 -s 512 -pv 0x02 -p $tpm_pw`;
-        ($? == 0) || die "Could not create tboot policy index in the TPM NVRAM";
+    `tpm_nvdefine -i 0x20000001 -s 512 -p 'OWNERWRITE' -z -y`;
+    #`tpmnv_defindex -i 0x20000001 -s 512 -pv 0x02 -p $tpm_pw`;
+    ($? == 0) || die "Could not create tboot policy index in the TPM NVRAM";
 #    } else {
-#	print STDERR "Tboot policy index exists in the TPM NVRAM\n";
 #    }
+#    print STDERR "Tboot policy index already exists in the TPM NVRAM\n" if $?;
+#    print STDERR "that's OK.  Don't be scared by Tspi errors above\n" if $?;
     # Ensure that we have the error index 0x20000002 defined
     #`tpm_nvinfo -n | grep -q 0x20000002`;
-    `tpmnv_relindex -i 0x20000002 -p $tpm_pw`;
+    #`tpmnv_relindex -i 0x20000002 -p $tpm_pw`;
+    `tpm_nvrelease -i 0x20000002 -y`;
     print STDERR "SINIT error index didn't exist in TPM NVRAM\n" if $?;
 #    if ($?) {
         print STDERR "Creating SINIT error index in the TPM NVRAM\n";
-        `tpmnv_defindex -i 0x20000002 -s 8 -pv 0 -rl 0x07 -wl 0x07 -p $tpm_pw`;
-        #`tpm_nvdefine -i 0x20000002 -s 8 -p 'OWNERWRITE' -z -y`;
+        #`tpmnv_defindex -i 0x20000002 -s 8 -pv 0 -rl 0x07 -wl 0x07 -p $tpm_pw`;
+        `tpm_nvdefine -i 0x20000002 -s 8 -p 'OWNERWRITE' -z -y`;
         ($? == 0) || die "Could not create SINIT error index in the TPM NVRAM\n";
 #    } else {
 #        print STDERR "SINIT error index exists in the TPM NVRAM\n";
@@ -139,14 +143,15 @@ sub writeTpmNvram {
     # The owner index is sometimes pre-defined on delivery of the system
     # TODO: Add tpm owner password
     #`tpm_nvinfo -n | grep -q 0x40000001`;
-    `tpmnv_relindex -i owner -p $tpm_pw`;
+    #`tpmnv_relindex -i owner -p $tpm_pw`;
+    `tpm_nvrelease -i 0x40000001 -y`;
     print STDERR "LCP index didn't exist in TPM NVRAM\n" if $?;
 #    if ($?) {
 	print STDERR "Creating LCP index in the TPM NVRAM\n";
         #`tpmnv_defindex -i owner -p $tpm_pw`;
         #($? == 0) || die "Could not create LCP index in the TPM NVRAM";
-        `tpmnv_defindex -i owner -p $tpm_pw`;
-	#`tpm_nvdefine -i 0x40000001 -s 54 -p 'OWNERWRITE' -z -y`;
+        #`tpmnv_defindex -i owner -p $tpm_pw`;
+	`tpm_nvdefine -i 0x40000001 -s 54 -p 'OWNERWRITE' -z -y`;
         ($? == 0) || die "Could not modify LCP index in the TPM NVRAM";
 #    } else {
 #	print STDERR "LCP index exists in the TPM NVRAM\n";
@@ -165,16 +170,21 @@ sub writeTpmNvram {
         $display = `lcp_crtpol2 --show $lcp_policy`;
     }
     print STDERR "Writing policy: $display\n";
-    `lcp_writepol -i owner -f $lcp_policy -p $tpm_pw`;
-    #`tpm_nvwrite -z -i 0x40000001 -f $lcp_policy`;
+    #`lcp_writepol -i owner -f $lcp_policy -p $tpm_pw`;
+    #`lcp_writepol -i owner -f $lcp_policy`;
+    `tpm_nvwrite -z -i 0x40000001 -f $lcp_policy`;
     ($? == 0) || die "Failed to write LCP index in the TPM NVRAM";
     print STDERR "Success\n";
     $display = `tb_polgen --show $vl_policy`;
     print STDERR "Writing policy: $display\n";
-    `lcp_writepol -i 0x20000001 -f $vl_policy -p $tpm_pw`;
+    #`lcp_writepol -i 0x20000001 -f $vl_policy -p $tpm_pw`;
+    #`lcp_writepol -i 0x20000001 -f $vl_policy`;
     #`tpm_nvwrite -z -i 0x20000001 -f $vl_policy -p $tpm_pw`;
+    `tpm_nvwrite -z -i 0x20000001 -f $vl_policy`;
     ($? == 0) || die "Failed to write tboot index in the TPM NVRAM";
     print STDERR "Success\n";
+    print STDERR "WARNING: The current policy is written without a TPM password\n";
+    print STDERR "WARNING: This is for testing only\n";
 }
 
 # (add module /list.data to grub)
