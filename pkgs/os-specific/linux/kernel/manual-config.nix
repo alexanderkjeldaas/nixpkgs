@@ -219,8 +219,6 @@ stdenv.mkDerivation ((drvAttrs config stdenv.platform (kernelPatches ++ nativeKe
 
   makeFlags = commonMakeFlags ++ [
     "ARCH=${stdenv.platform.kernelArch}"
-    "KBUILD_BUILD_VERSION=1-NixOS"
-    "KBUILD_BUILD_TIMESTAMP=Thu Jan  1 00:00:01 UTC 1970"
   ];
 
   crossAttrs = let cp = stdenv.cross.platform; in
@@ -228,8 +226,6 @@ stdenv.mkDerivation ((drvAttrs config stdenv.platform (kernelPatches ++ nativeKe
       makeFlags = commonMakeFlags ++ [
         "ARCH=${cp.kernelArch}"
         "CROSS_COMPILE=$(crossConfig)-"
-        "KBUILD_BUILD_VERSION=1-NixOS"
-        "KBUILD_BUILD_TIMESTAMP=Thu Jan  1 00:00:01 UTC 1970"
       ];
 
       # !!! uboot has messed up cross-compiling, nativeDrv builds arm tools on x86,
