@@ -46,7 +46,7 @@ if ! test -e "$mountPoint"; then
     exit 1
 fi
 
-if ! grep -F -q " $mountPoint " /proc/mounts; then
+if test -z "$allowNonEmptyMountpoint" && ! grep -F -q " $mountPoint " /proc/mounts; then
     echo "$mountPoint doesn't appear to be a mount point"
     exit 1
 fi
