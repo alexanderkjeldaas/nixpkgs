@@ -59,7 +59,7 @@ let
   efiImg = pkgs.runCommand "efi-image_eltorito" { buildInputs = [ pkgs.mtools ]; }
     ''
       #Let's hope 10M is enough
-      dd bs=2048 count=5120 if=/dev/zero of="$out"
+      dd bs=81920 count=8192 if=/dev/zero of="$out"
       ${pkgs.dosfstools}/sbin/mkfs.vfat "$out"
       mcopy -svi "$out" ${efiDir}/* ::
       mmd -i "$out" boot
