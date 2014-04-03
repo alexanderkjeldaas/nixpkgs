@@ -38,6 +38,24 @@ let
          }
     else pkgs.busybox;
 
+  makeProg = args: pkgs.substituteAll (args // {
+    dir = "bin";
+    isExecutable = true;
+  });
+
+  nixosInstall = pkgs.substituteAll {
+    name = "nixos-install.sh";
+    src = ../../installer/tools/nixos-install.sh;
+    isExecutable = true;
+
+    inherit (pkgs) perl pathsFromGraph;
+    nix = config.nix.package;
+
+    nixClosure = pkgs.runCommand "closure"
+      { exportReferencesGraph = ["refs" config.nix.package]; }
+      "cp refs $out";
+  };
+
 
   # Some additional utilities needed in stage 1, like mount, lvm, fsck
   # etc.  We don't want to bring in all of those packages, so we just
@@ -216,6 +234,9 @@ let
     contents =
       [ { object = bootStage1;
           symlink = "/init";
+        }
+        { object = nixosInstall;
+          symlink = "/nixos-install";
         }
         { object = pkgs.writeText "mdadm.conf" config.boot.initrd.mdadmConf;
           symlink = "/etc/mdadm.conf";
