@@ -383,9 +383,9 @@ in
         pkgs.iproute
         pkgs.iputils
         pkgs.nettools
-        pkgs.wirelesstools
-        pkgs.iw
-        pkgs.rfkill
+#        pkgs.wirelesstools
+#        pkgs.iw
+#        pkgs.rfkill
         pkgs.openresolv
       ]
       ++ optional (cfg.bridges != {}) pkgs.bridge_utils
