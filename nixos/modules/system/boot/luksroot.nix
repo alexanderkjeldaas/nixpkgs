@@ -5,7 +5,7 @@ with pkgs.lib;
 let
   luks = config.boot.initrd.luks;
 
-  openCommand = { name, device, keyFile, keyFileSize, allowDiscards, yubikey, ... }: ''
+  openCommand = { name, device, keyFile, keyFileSize, allowDiscards, yubikey, tpm, ... }: ''
     # Wait for luksRoot to appear, e.g. if on a usb drive.
     # XXX: copied and adapted from stage-1-init.sh - should be
     # available as a function.
@@ -33,8 +33,103 @@ let
 
     open_normally() {
         cryptsetup luksOpen ${device} ${name} ${optionalString allowDiscards "--allow-discards"} \
-          ${optionalString (keyFile != null) "--key-file=${keyFile} ${optionalString (keyFileSize != null) "--keyfile-size=${toString keyFileSize}"}"}
+          ${optionalString (keyFile != null) "--key-file=${keyFile} "} \
+          ${optionalString (keyFileSize != null) "--keyfile-size=${toString keyFileSize} "}
     }
+
+    ${optionalString (luks.tpmSupport) ''
+    
+    tpm_luks_open() {
+        if [ ! -f ${tpm.storage.path} ]; then
+            echo "Warning: Could not find sealed key file at ${tpm.storage.path}"
+            return 1
+        elif ! tpm_unsealdata -z ${tpm.storage.path} | cryptsetup luksOpen ${device} \
+                   ${name} ${optionalString allowDiscards "--allow-discards"} --key-file=-; then
+            echo "Warning: Could not unseal the LUKS key at ${tpm.storage.path}"
+            return 1
+        else
+            return 0
+        fi
+    }
+
+    # intersperse second argument between words of first argument
+    intersperse() {
+        # trim and then intersperse
+        echo $1 | sed -e 's/^ *\(.*[^ ]\).*$/\1/g' -e "s/  */ $2 /g"
+    }
+
+    tpm_maybe_format() {
+        local pcrs;
+        if [ -f ${tpm.storage.path} ]; then
+            echo "Error: sealed key file exists at ${tpm.storage.path}"
+            return 1
+        fi
+        if cryptsetup isLuks ${device}; then
+            echo "Error: device is already a LUKS device"
+            echo "wipe the header before proceeding ${device}"
+            return 1
+        fi
+        if ! touch ${tpm.storage.path}; then
+            echo "Error: cannot write to sealed key file at ${tpm.storage.path}"
+            return 1
+        fi
+        rm -f ${tpm.storage.path}
+        pcrs=$(intersperse ${tpm.sealPcrs} '-p')
+        if [ -z "$pcrs" ]; then
+            echo "Error: Cannot seal to an empty list of PCRs!"
+            return 1
+        fi
+        # Sealing and unsealing isn't terribly efficient, but we're only doing 
+        # it once, and then we don't have to keep the key in this process
+        dd if=/dev/random bs=1 count=32 | tpm_sealdata -z ${tpm.storage.path} ${tpm.sealPcrs}
+        tpm_unsealdata -z -i ${tpm.storage.path} |
+            cryptsetup luksFormat ${device} --use-random --batch-mode
+    }
+
+    # We have just created a LUKS partition, now install nixos on it.
+    tpm_nixos_install() {
+        local tmp_mnt
+        tmp_mnt=/tmp-mnt-$RANDOM
+        mkdir -p $tmp_mnt
+        ( cd $tmp_mnt
+          cp -arv / 
+          # We're cheating and starting this a bit early so we can mount and populate.
+          lvm vgchange -ay
+          mount 
+        
+    }
+            
+    tpm_open() {
+        local need_install=false
+        mkdir -p ${tpm.storage.mountPoint}
+        mount ${toString tpm.storage.device} ${tpm.storage.mountPoint}
+        # We need tcsd in order to unseal. It should be later killed
+        # and restarted in a proper environment.
+	if ! tcsd; then
+            echo "Error: Trusted Computing resource daemon (tcsd) could not be started"
+            umount ${tpm.storage.mountPoint}
+            return 1
+        fi
+    ${optionalString (tpm.autoInstall) ''
+        if tpm_maybe_format; then
+            need_install=true
+        fi
+    ''}
+        if ! tpm_luks_open; then
+            echo "Error: Could not open LUKS device ${device} ${name}"
+            umount ${tpm.storage.mountPoint}
+            return 1
+        fi
+        umount ${tpm.storage.mountPoint}
+    ${optionalString (tpm.autoInstall) ''
+        if $need_install; then
+            tpm_nixos_install
+        fi
+    ''}
+
+    
+    }
+    ''}
 
     ${optionalString (luks.yubikeySupport && (yubikey != null)) ''
 
@@ -183,8 +278,11 @@ let
     ''}
 
     # open luksRoot and scan for logical volumes
-    ${optionalString ((!luks.yubikeySupport) || (yubikey == null)) ''
+    ${optionalString (((!luks.yubikeySupport) || (yubikey == null)) && (!luks.tpmSupport)) ''
     open_normally
+    ''}
+    ${optionalString (luks.tpmSupport) ''
+    tpm_open
     ''}
   '';
 
@@ -291,6 +389,65 @@ in
           '';
         };
 
+        tpm = mkOption {
+          default = null;
+          type = types.nullOr types.optionSet;
+          description = ''
+            The options to protect this LUKS device using the Trusted Platform Module (TPM).
+            If null (the default), use of a TPM will be disabled for this device.
+          '';
+
+          options = {
+            autoInstall = mkOption {
+              default = true;
+              type = types.bool;
+              description = "Do automatic installation on the device";
+            };
+
+            sealPcrs = mkOption {
+              default = "17";
+              type = types.string;
+              description = "List of PCR values to bind the LUKS key to";
+            };
+
+            storage = mkOption {
+              type = types.optionSet;
+              description = "Options related to storing the sealed key (on unencrypted device)";
+
+              options = {
+                device = mkOption {
+                  default = /dev/sda1;
+                  type = types.path;
+                  description = ''An unencrypted device that will temporarily be mounted in stage-1
+                    in order to store the TPM-sealed key.  If autoInstall is enabled, the key will
+                    be written to this device.  Otherwise it must exist under the given path.
+                  '';
+                };
+
+                mountPoint = mkOption {
+                  default = "/tpm-keys";
+                  type = types.path;
+                  description = ''Mount point for the device containing the TPM-sealed key'';
+                };
+
+                path = mkOption {
+                  default = "/crypt-storage/tpm-luks-sealed-key";
+                  type = types.string;
+                  description = ''
+                    Relative path to the TPM-sealed LUKS password file on the device that holds it.
+                    A password file can be created for example like this:
+                    $ dd if=/dev/random bs=1 count=32 | tpm_sealdata -z -p17 -o outputfile
+
+                    However, if autoInstall.closure is set it will automatically be created
+                    during the initial automatic install and it should not exist prior to the
+                    auto-install.
+                    '';
+                };
+              };
+            };
+          };
+	};
+
         yubikey = mkOption {
           default = null;
           type = types.nullOr types.optionSet;
@@ -380,11 +537,20 @@ in
             };
           };
         };
-
       };
     };
 
     boot.initrd.luks.yubikeySupport = mkOption {
+      default = false;
+      type = types.bool;
+      description = ''
+            Enables support for authenticating with a Yubikey on LUKS devices.
+            See the NixOS wiki for information on how to properly setup a LUKS device
+            and a Yubikey to work with this feature.
+          '';
+    };
+
+    boot.initrd.luks.tpmSupport = mkOption {
       default = false;
       type = types.bool;
       description = ''
@@ -435,6 +601,24 @@ in
 EOF
       chmod +x $out/bin/openssl-wrap
       ''}
+      
+      ${optionalString luks.tpmSupport ''
+      # tpm-tools
+      cp -pdv ${pkgs.tpm-tools}/bin/tpm_{un,}sealdata $out/bin
+      cp -pdv ${pkgs.tpm-tools}/lib/libtpm*.so.* $out/lib
+      cp -pdv ${pkgs.trousers}/lib/libtspi*.so.* $out/lib
+      # tcsd
+      cp -pdv ${pkgs.trousers}/sbin/tcsd $out/bin
+#      cp -pdv ${pkgs.glibc}/lib/libpthread*.so.* $out/lib
+      cp -pdv ${pkgs.openssl}/lib/libssl*.so.* $out/lib
+      cp -pdv ${pkgs.openssl}/lib/libcrypto*.so.* $out/lib
+      # mkfs.ext4 in case of an install
+#      cp -pdv ${pkgs.e2fsprogs}/sbin/mke2fs $out/sbin
+#      ln -s mke2fs $out/sbin/mkfs.ext4
+#      cp -pdv ${pkgs.utillinux}/lib/libblkid*.so* $out/lib
+#      cp -pdv ${pkgs.utillinux}/lib/libuuid*.so* $out/lib
+      ''}
+
     '';
 
     boot.initrd.extraUtilsCommandsTest = ''
