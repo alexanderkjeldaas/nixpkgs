@@ -147,9 +147,9 @@ in
     # Add the mount helpers to the system path so that `mount' can find them.
     system.fsPackages = [ pkgs.dosfstools ];
 
-    environment.systemPackages =
-      [ pkgs.ntfs3g pkgs.cifs_utils pkgs.fuse ]
-      ++ config.system.fsPackages;
+    environment.systemPackages = config.system.fsPackages;
+#      [ pkgs.ntfs3g pkgs.cifs_utils pkgs.fuse ]
+#      ++ config.system.fsPackages;
 
     environment.etc.fstab.text =
       ''
