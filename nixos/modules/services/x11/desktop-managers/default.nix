@@ -70,7 +70,7 @@ in
 
   config = {
     services.xserver.displayManager.session = cfg.session.list;
-    environment.systemPackages =
-      mkIf cfg.session.needBGPackages [ pkgs.feh ];
+#    environment.systemPackages =
+#      mkIf cfg.session.needBGPackages [ pkgs.feh ];
   };
 }
