@@ -367,4 +367,9 @@ rec {
     http://lib.stat.cmu.edu/
   ];
 
+  ossporg = [
+    ftp://ftp.ossp.org/
+    http://www.mirrorservice.org/sites/ftp.ossp.org/
+  ];
+
 }
