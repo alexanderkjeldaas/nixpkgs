@@ -76,14 +76,9 @@ stdenv.mkDerivation rec {
        export XDG_RUNTIME_HOME="$TMP"
        export HOME="$TMP"
        export XDG_DATA_DIRS="${desktop_file_utils}/share:${shared_mime_info}/share"
-       # patch python interpreter to write null timestamps when
-       # compiling python files with following var we tell python to
-       # activate the patch so that python doesn't try to update them
-       # when we freeze timestamps in nix store
-       export DETERMINISTIC_BUILD=1
     '';
 
-  postInstall = ''rm -rvf $out/share/gtk-doc'';
+  DETERMINISTIC_BUILD = 1;
 
   passthru = {
      gioModuleDir = "lib/gio/modules";

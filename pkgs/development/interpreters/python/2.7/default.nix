@@ -68,15 +68,10 @@ let
         touch $out/lib/python${majorVersion}/config/Makefile
         mkdir -p $out/include/python${majorVersion}
         touch $out/include/python${majorVersion}/pyconfig.h
-
-        # patch python interpreter to write null timestamps when
-        # compiling python files with following var we tell python to
-        # activate the patch so that python doesn't try to update them
-        # when we freeze timestamps in nix store
-        export DETERMINISTIC_BUILD=1
       '';
 
     NIX_CFLAGS_COMPILE = optionalString stdenv.isDarwin "-msse2";
+    DETERMINISTIC_BUILD = 1;
 
     setupHook = ./setup-hook.sh;
 
