@@ -102,7 +102,9 @@ fi
 # When enforcing purity, pretend we're in the 70's
 if [ "$NIX_ENFORCE_PURITY" = "1" -a -n "@libfaketime@" ]; then
     fakeTimePreload=(LD_PRELOAD=@libfaketime@/lib/libfaketime.so.1
-	             FAKETIME="1970-01-01\ 00:00:01")
+	             FAKETIME="1970-01-01\ 00:00:01"
+                     FAKETIME_ONLY_CMDS="gcc,date"
+                    )
 else
     fakeTimePreload=()
 fi
