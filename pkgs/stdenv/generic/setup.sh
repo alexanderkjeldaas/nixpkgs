@@ -624,10 +624,10 @@ buildPhase() {
     makeFlags="SHELL=$SHELL $makeFlags"
 
     echo "make flags: $makeFlags ${makeFlagsArray[@]} $buildFlags ${buildFlagsArray[@]}"
-    eval $(echo "${fakeTimePreload[@]}") make ${makefile:+-f $makefile} \
+    eval $(echo "${fakeTimePreload[@]}") 'make ${makefile:+-f $makefile} \
         ${enableParallelBuilding:+-j${NIX_BUILD_CORES} -l${NIX_BUILD_CORES}} \
         $makeFlags "${makeFlagsArray[@]}" \
-        $buildFlags "${buildFlagsArray[@]}"
+        $buildFlags "${buildFlagsArray[@]}"'
 
     runHook postBuild
 }
@@ -637,10 +637,10 @@ checkPhase() {
     runHook preCheck
 
     echo "check flags: $makeFlags ${makeFlagsArray[@]} $checkFlags ${checkFlagsArray[@]}"
-    eval $(echo "${fakeTimePreload[@]}") make ${makefile:+-f $makefile} \
+    eval $(echo "${fakeTimePreload[@]}") 'make ${makefile:+-f $makefile} \
         ${enableParallelBuilding:+-j${NIX_BUILD_CORES} -l${NIX_BUILD_CORES}} \
         $makeFlags "${makeFlagsArray[@]}" \
-        ${checkFlags:-VERBOSE=y} "${checkFlagsArray[@]}" ${checkTarget:-check}
+        ${checkFlags:-VERBOSE=y} "${checkFlagsArray[@]}" ${checkTarget:-check}'
 
     runHook postCheck
 }
@@ -727,9 +727,9 @@ installPhase() {
 
     installTargets=${installTargets:-install}
     echo "install flags: $installTargets $makeFlags ${makeFlagsArray[@]} $installFlags ${installFlagsArray[@]}"
-    eval $(echo "${fakeTimePreload[@]}") make ${makefile:+-f $makefile} $installTargets \
+    eval $(echo "${fakeTimePreload[@]}") 'make ${makefile:+-f $makefile} $installTargets \
         $makeFlags "${makeFlagsArray[@]}" \
-        $installFlags "${installFlagsArray[@]}"
+        $installFlags "${installFlagsArray[@]}"'
 
     runHook postInstall
 }
@@ -832,10 +832,10 @@ installCheckPhase() {
     runHook preInstallCheck
 
     echo "installcheck flags: $makeFlags ${makeFlagsArray[@]} $installCheckFlags ${installCheckFlagsArray[@]}"
-    eval $(echo "${fakeTimePreload[@]}") make ${makefile:+-f $makefile} \
+    eval $(echo "${fakeTimePreload[@]}") 'make ${makefile:+-f $makefile} \
         ${enableParallelBuilding:+-j${NIX_BUILD_CORES} -l${NIX_BUILD_CORES}} \
         $makeFlags "${makeFlagsArray[@]}" \
-        $installCheckFlags "${installCheckFlagsArray[@]}" ${installCheckTarget:-installcheck}
+        $installCheckFlags "${installCheckFlagsArray[@]}" ${installCheckTarget:-installcheck}'
 
     runHook postInstallCheck
 }
@@ -845,8 +845,8 @@ distPhase() {
     runHook preDist
 
     echo "dist flags: $distFlags ${distFlagsArray[@]}"
-    eval $("${fakeTimePreload[@]}") make ${makefile:+-f $makefile} $distFlags "${distFlagsArray[@]}" \
-        ${distTarget:-dist}
+    eval $("${fakeTimePreload[@]}") 'make ${makefile:+-f $makefile} $distFlags "${distFlagsArray[@]}" \
+        ${distTarget:-dist}'
 
     if [ "$dontCopyDist" != 1 ]; then
         mkdir -p "$out/tarballs"
