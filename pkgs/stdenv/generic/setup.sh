@@ -99,6 +99,14 @@ if [ "$NIX_DEBUG" = 1 ]; then
     echo "initial path: $PATH"
 fi
 
+# By setting useFakeTime, the time can be overridden.
+# The following example sets the time to 1 for gcc and date
+# FAKETIME="1970-01-01\ 00:00:01"
+# FAKETIME_ONLY_CMDS="gcc,date"
+if [ "$NIX_ENFORCE_PURITY" = "1" -a -n "@libfaketime@" -a
+     -n "$useFakeTime" ]; then
+    makePreloads=(${makePreloads[@]} LD_PRELOAD=@libfaketime@/lib/libfaketime.so.1)
+fi
 
 # Execute the pre-hook.
 export SHELL=@shell@
@@ -617,10 +625,10 @@ buildPhase() {
     makeFlags="SHELL=$SHELL $makeFlags"
 
     echo "make flags: $makeFlags ${makeFlagsArray[@]} $buildFlags ${buildFlagsArray[@]}"
-    make ${makefile:+-f $makefile} \
+    eval $(echo "${makePreloads[@]}") 'make ${makefile:+-f $makefile} \
         ${enableParallelBuilding:+-j${NIX_BUILD_CORES} -l${NIX_BUILD_CORES}} \
         $makeFlags "${makeFlagsArray[@]}" \
-        $buildFlags "${buildFlagsArray[@]}"
+        $buildFlags "${buildFlagsArray[@]}"'
 
     runHook postBuild
 }
@@ -630,10 +638,10 @@ checkPhase() {
     runHook preCheck
 
     echo "check flags: $makeFlags ${makeFlagsArray[@]} $checkFlags ${checkFlagsArray[@]}"
-    make ${makefile:+-f $makefile} \
+    eval $(echo "${makePreloads[@]}") 'make ${makefile:+-f $makefile} \
         ${enableParallelBuilding:+-j${NIX_BUILD_CORES} -l${NIX_BUILD_CORES}} \
         $makeFlags "${makeFlagsArray[@]}" \
-        ${checkFlags:-VERBOSE=y} "${checkFlagsArray[@]}" ${checkTarget:-check}
+        ${checkFlags:-VERBOSE=y} "${checkFlagsArray[@]}" ${checkTarget:-check}'
 
     runHook postCheck
 }
@@ -720,9 +728,9 @@ installPhase() {
 
     installTargets=${installTargets:-install}
     echo "install flags: $installTargets $makeFlags ${makeFlagsArray[@]} $installFlags ${installFlagsArray[@]}"
-    make ${makefile:+-f $makefile} $installTargets \
+    eval $(echo "${makePreloads[@]}") 'make ${makefile:+-f $makefile} $installTargets \
         $makeFlags "${makeFlagsArray[@]}" \
-        $installFlags "${installFlagsArray[@]}"
+        $installFlags "${installFlagsArray[@]}"'
 
     runHook postInstall
 }
@@ -825,10 +833,10 @@ installCheckPhase() {
     runHook preInstallCheck
 
     echo "installcheck flags: $makeFlags ${makeFlagsArray[@]} $installCheckFlags ${installCheckFlagsArray[@]}"
-    make ${makefile:+-f $makefile} \
+    eval $(echo "${makePreloads[@]}") 'make ${makefile:+-f $makefile} \
         ${enableParallelBuilding:+-j${NIX_BUILD_CORES} -l${NIX_BUILD_CORES}} \
         $makeFlags "${makeFlagsArray[@]}" \
-        $installCheckFlags "${installCheckFlagsArray[@]}" ${installCheckTarget:-installcheck}
+        $installCheckFlags "${installCheckFlagsArray[@]}" ${installCheckTarget:-installcheck}'
 
     runHook postInstallCheck
 }
@@ -838,7 +846,8 @@ distPhase() {
     runHook preDist
 
     echo "dist flags: $distFlags ${distFlagsArray[@]}"
-    make ${makefile:+-f $makefile} $distFlags "${distFlagsArray[@]}" ${distTarget:-dist}
+    eval $("${makePreloads[@]}") 'make ${makefile:+-f $makefile} $distFlags "${distFlagsArray[@]}" \
+        ${distTarget:-dist}'
 
     if [ "$dontCopyDist" != 1 ]; then
         mkdir -p "$out/tarballs"

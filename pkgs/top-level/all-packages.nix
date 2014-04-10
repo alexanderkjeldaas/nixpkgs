@@ -4940,6 +4940,8 @@ let
 
   libf2c = callPackage ../development/libraries/libf2c {};
 
+  libfaketime = callPackage ../development/libraries/libfaketime {};
+
   libfixposix = callPackage ../development/libraries/libfixposix {};
 
   libffcall = builderDefsPackage (import ../development/libraries/libffcall) {
