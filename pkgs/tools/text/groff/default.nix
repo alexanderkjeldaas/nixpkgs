@@ -33,9 +33,7 @@ stdenv.mkDerivation rec {
       # avoid non-determinism in the output
       rm $out/share/doc/${name}/examples/hdtbl/*color*ps
       # Remove creation date
-      sed -i -i 's/%%CreationDate: .*//' \
-          $out/share/doc/${name}/examples/hdtbl/* \
-          $out/share/doc/${name}/examples/*.ps
+      find $out/share/doc/${name} -type f -print0 | xargs -0 sed -i -e 's/%%CreationDate: .*//'
     '';
 
   meta = {
