@@ -35,7 +35,6 @@ let
       inherit preHook initialPath gcc shell libfaketime;
 
       propagatedUserEnvPkgs = [gcc] ++
-        lib.optionals (libfaketime != null) [libfaketime] ++
         lib.filter lib.isDerivation initialPath;
 
       __ignoreNulls = true;
@@ -88,8 +87,7 @@ let
               # Inputs built by the usual native compiler.
               nativeBuildInputs = nativeBuildInputs ++ lib.optionals (crossConfig == null) (buildInputs ++ extraBuildInputs) ++ lib.optionals (libfaketime != null) [libfaketime];
               propagatedNativeBuildInputs = propagatedNativeBuildInputs ++
-                lib.optionals (crossConfig == null) propagatedBuildInputs ++
-                lib.optionals (libfaketime != null) [libfaketime];
+                lib.optionals (crossConfig == null) propagatedBuildInputs;
           }))) (
           {
             # The meta attribute is passed in the resulting attribute set,
