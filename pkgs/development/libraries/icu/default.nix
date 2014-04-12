@@ -26,6 +26,7 @@ stdenv.mkDerivation {
   configureFlags = "--disable-debug";
 
   enableParallelBuilding = true;
+  useFakeTime = 1;
 
   meta = {
     description = "Unicode and globalization support library";
