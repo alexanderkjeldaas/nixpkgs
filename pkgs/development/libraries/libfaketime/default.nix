@@ -25,6 +25,8 @@ stdenv.mkDerivation rec
     makeFlags="PREFIX=$out LIBDIRNAME=/lib"
     '';
 
+  patches = [ ./avoid-spurious-lrt.patch ];
+
   meta =
   {
     homepage = "https://github.com/wolfcw/libfaketime";
