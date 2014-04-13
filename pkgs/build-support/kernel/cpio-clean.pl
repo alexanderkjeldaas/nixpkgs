@@ -9,11 +9,11 @@ use Archive::Cpio;
 my $cpio = Archive::Cpio->new;
 my $IN = \*STDIN;
 my $ino = 1;
+my %ino_remap = {};
 $cpio->read_with_handler($IN, sub {
         my ($e) = @_;
-        $e->{inode} = $ino;
-        $ino++;
-        $e->{nlink} = 1;
+        $ino_remap{$e->{inode}} = $ino++ unless exists $ino_remap{$e->{inode}};
+        $e->{inode} = $ino_remap{$e->{inode}};
         $e->{mtime} = 1;
 	$cpio->write_one(\*STDOUT, $e);
     });
