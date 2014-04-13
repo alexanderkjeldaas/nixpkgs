@@ -25,7 +25,10 @@ stdenv.mkDerivation rec
     makeFlags="PREFIX=$out LIBDIRNAME=/lib"
     '';
 
-  patches = [ ./avoid-spurious-lrt.patch ];
+  patches = [
+    ./avoid-spurious-lrt.patch
+    ./no-date-in-gzip-man-page.patch
+  ];
 
   meta =
   {
