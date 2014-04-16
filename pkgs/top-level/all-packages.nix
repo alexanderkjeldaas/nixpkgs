@@ -618,6 +618,8 @@ let
     enableStandardFeatures = true;
   });
 
+  atomicops = callPackage ../development/libraries/atomic-ops { };
+
   autossh = callPackage ../tools/networking/autossh { };
 
   bacula = callPackage ../tools/backup/bacula { };
