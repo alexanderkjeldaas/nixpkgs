@@ -59,7 +59,9 @@ let version = "4.9.1";
 
     enableParallelBuilding = true;
 
-    patches = [ ]
+    patches = [ 
+         ./gcc-default-ssp.diff
+      ]
       ++ optional enableParallelBuilding ./parallel-bconfig.patch
       ++ optional (cross != null) ./libstdc++-target.patch
       # ++ optional noSysDirs ./no-sys-dirs.patch
