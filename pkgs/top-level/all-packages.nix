@@ -16695,6 +16695,8 @@ with pkgs;
 
   xst = callPackage ../applications/misc/st/xst.nix { };
 
+  xmr-stak = callPackage ../applications/misc/xmr-stak { };
+  
   stag = callPackage ../applications/misc/stag {
     curses = ncurses;
   };
