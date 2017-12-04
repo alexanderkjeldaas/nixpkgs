@@ -3,6 +3,7 @@
 , devDonationLevel ? "0.0"
 , cudaSupport ? false
 , openclSupport ? false
+, amdgpu-pro, proot }:
 }:
 
 stdenv.mkDerivation rec {
@@ -37,4 +38,11 @@ stdenv.mkDerivation rec {
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ fpletz ];
   };
+  #postInstall =
+  #    ''
+  #    echo '#!/bin/sh' >> $out/bin/xmr-stak.sh
+  #    echo 'export PROOT_NO_SECCOMP=1' >> $out/bin/xmr-stak.sh
+  #    echo "${proot}/bin/proot -r / -b ${amdgpu-pro}/etc/OpenCL:/etc/OpenCL -b ${libdrm}/share/libdrm:/opt/amdgpu-pro/share/libdrm -b ${amdgpu-pro}/etc/amd:/etc/amd $out/bin/xmr-stak" >> $out/bin/xmr-stak.sh
+  #    chmod 755 $out/bin/xmr-stak.sh
+  #  '';
 }
