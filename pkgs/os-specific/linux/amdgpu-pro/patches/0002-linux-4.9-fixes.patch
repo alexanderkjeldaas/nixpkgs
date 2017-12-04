@@ -8,17 +8,6 @@ Subject: [PATCH 2/4] linux-4.9 fixes
  amd/display/amdgpu_dm/amdgpu_dm_types.c | 8 ++++++++
  2 files changed, 10 insertions(+)
 
-diff --git a/amd/amdkcl/kcl_io.c b/amd/amdkcl/kcl_io.c
-index d8f843f..9a1bd9b 100644
---- a/amd/amdkcl/kcl_io.c
-+++ b/amd/amdkcl/kcl_io.c
-@@ -31,4 +31,6 @@ void amdkcl_io_init(void)
- 	_kcl_io_free_memtype = amdkcl_fp_setup("io_free_memtype", NULL);
- }
- #endif
-+#else
-+void amdkcl_io_init(void) {}
- #endif /* LINUX_VERSION_CODE < KERNEL_VERSION(4, 9, 0) */
 diff --git a/amd/display/amdgpu_dm/amdgpu_dm_types.c b/amd/display/amdgpu_dm/amdgpu_dm_types.c
 index 34313a9..44a4a71 100644
 --- a/amd/display/amdgpu_dm/amdgpu_dm_types.c
