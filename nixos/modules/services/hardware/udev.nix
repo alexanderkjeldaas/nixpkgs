@@ -26,6 +26,8 @@ let
     # Miscellaneous devices.
     KERNEL=="kvm",                  MODE="0666"
     KERNEL=="kqemu",                MODE="0666"
+    # AMD, also exists in newer systemd
+    SUBSYSTEM=="kfd", GROUP="render", MODE="0666"
 
     # Needed for gpm.
     SUBSYSTEM=="input", KERNEL=="mice", TAG+="systemd"

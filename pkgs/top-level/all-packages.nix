@@ -16697,6 +16697,9 @@ with pkgs;
 
   xmr-stak = callPackage ../applications/misc/xmr-stak { };
   
+  amdgpu-pro = callPackage ../os-specific/linux/amdgpu-pro { libsOnly = true; };
+
+
   stag = callPackage ../applications/misc/stag {
     curses = ncurses;
   };

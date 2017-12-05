@@ -2,7 +2,7 @@
 
 stdenv.mkDerivation rec {
   name = "firmware-linux-nonfree-${version}";
-  version = "2017-10-09-${src.iwlRev}";
+  version = "2017-12-04-${src.iwlRev}";
 
   # The src runCommand automates the process of building a merged repository of both
   #
@@ -18,11 +18,11 @@ stdenv.mkDerivation rec {
 
   src = runCommand "firmware-linux-nonfree-src-merged-${version}" {
     # When updating this, you need to let it run with a wrong hash, in order to find out the desired hash
-    baseRev = "bf04291309d3169c0ad3b8db52564235bbd08e30";
+    baseRev = "30946b9b1787f086e8a1a3cb60658447212979c9";
     iwlRev = "iwlwifi-fw-2017-11-03";
 
     # randomly mutate the hash to break out of fixed hash, when updating
-    outputHash = "11izv1vpq9ixlqdss19lzs5q289d7jxr5kgf6iymk4alxznffd8z";
+    outputHash = "1fngbs5bf3cdrdb4wwfq51if532939lxvqnj9nky8v84h4dz2f17";
 
     outputHashAlgo = "sha256";
     outputHashMode = "recursive";
