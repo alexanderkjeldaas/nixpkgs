@@ -1,0 +1,20 @@
+--- a/amd/amdgpu/amdgpu_device.c	2017-12-03 22:53:18.093799871 +0100
++++ b/amd/amdgpu/amdgpu_device.c	2017-12-03 22:53:59.875665742 +0100
+@@ -3164,7 +3164,7 @@
+ 	struct drm_info_node *node, *tmp;
+ 
+ 	if (!&minor->debugfs_root)
+-		return 0;
++		return;
+ 
+ 	mutex_lock(&minor->debugfs_lock);
+ 	list_for_each_entry_safe(node, tmp,
+@@ -3175,7 +3175,7 @@
+ 	}
+ 	mutex_unlock(&minor->debugfs_lock);
+ 
+-	return 0;
++	return;
+ }
+ #endif
+ 
