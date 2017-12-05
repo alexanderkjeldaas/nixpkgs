@@ -527,8 +527,8 @@ with stdenv.lib;
   ${optionalString (versionAtLeast version "4.0") ''
     KVM_GENERIC_DIRTYLOG_READ_PROTECT y
   ''}
-  KVM_GUEST n
-  KVM_MMIO n
+  KVM_GUEST y
+  KVM_MMIO y
   ${optionalString (versionAtLeast version "3.13") ''
     KVM_VFIO y
   ''}
