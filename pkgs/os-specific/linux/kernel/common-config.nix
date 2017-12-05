@@ -116,11 +116,11 @@ with stdenv.lib;
   # Enable various subsystems.
   ACCESSIBILITY y # Accessibility support
   AUXDISPLAY y # Auxiliary Display support
-  DONGLE y # Serial dongle support
+  DONGLE? y # Serial dongle support
   HIPPI y
   MTD_COMPLEX_MAPPINGS y # needed for many devices
   SCSI_LOWLEVEL y # enable lots of SCSI devices
-  SCSI_LOWLEVEL_PCMCIA y
+  SCSI_LOWLEVEL_PCMCIA? y
   SCSI_SAS_ATA y  # added to enable detection of hard drive
   SPI y # needed for many devices
   SPI_MASTER y
@@ -220,30 +220,30 @@ with stdenv.lib;
   ''}
 
   # Sound.
-  SND_DYNAMIC_MINORS y
-  SND_AC97_POWER_SAVE y # AC97 Power-Saving Mode
-  SND_HDA_INPUT_BEEP y # Support digital beep via input layer
-  SND_HDA_RECONFIG y # Support reconfiguration of jack functions
-  SND_HDA_PATCH_LOADER y # Support configuring jack functions via fw mechanism at boot
-  SND_USB_CAIAQ_INPUT y
+  SND_DYNAMIC_MINORS? y
+  SND_AC97_POWER_SAVE? y # AC97 Power-Saving Mode
+  SND_HDA_INPUT_BEEP? y # Support digital beep via input layer
+  SND_HDA_RECONFIG? y # Support reconfiguration of jack functions
+  SND_HDA_PATCH_LOADER? y # Support configuring jack functions via fw mechanism at boot
+  SND_USB_CAIAQ_INPUT? y
   ${optionalString (versionOlder version "4.12") ''
     PSS_MIXER y # Enable PSS mixer (Beethoven ADSP-16 and other compatible)
   ''}
 
   # USB serial devices.
-  USB_SERIAL_GENERIC y # USB Generic Serial Driver
-  USB_SERIAL_KEYSPAN_MPR y # include firmware for various USB serial devices
-  USB_SERIAL_KEYSPAN_USA28 y
-  USB_SERIAL_KEYSPAN_USA28X y
-  USB_SERIAL_KEYSPAN_USA28XA y
-  USB_SERIAL_KEYSPAN_USA28XB y
-  USB_SERIAL_KEYSPAN_USA19 y
-  USB_SERIAL_KEYSPAN_USA18X y
-  USB_SERIAL_KEYSPAN_USA19W y
-  USB_SERIAL_KEYSPAN_USA19QW y
-  USB_SERIAL_KEYSPAN_USA19QI y
-  USB_SERIAL_KEYSPAN_USA49W y
-  USB_SERIAL_KEYSPAN_USA49WLC y
+  USB_SERIAL_GENERIC? y # USB Generic Serial Driver
+  USB_SERIAL_KEYSPAN_MPR? y # include firmware for various USB serial devices
+  USB_SERIAL_KEYSPAN_USA28? y
+  USB_SERIAL_KEYSPAN_USA28X? y
+  USB_SERIAL_KEYSPAN_USA28XA? y
+  USB_SERIAL_KEYSPAN_USA28XB? y
+  USB_SERIAL_KEYSPAN_USA19? y
+  USB_SERIAL_KEYSPAN_USA18X? y
+  USB_SERIAL_KEYSPAN_USA19W? y
+  USB_SERIAL_KEYSPAN_USA19QW? y
+  USB_SERIAL_KEYSPAN_USA19QI? y
+  USB_SERIAL_KEYSPAN_USA49W? y
+  USB_SERIAL_KEYSPAN_USA49WLC? y
 
   # Device mapper (RAID, LVM, etc.)
   MD y
@@ -283,58 +283,58 @@ with stdenv.lib;
   F2FS_FS_ENCRYPTION? y
   UDF_FS m
   ${optionalString (versionAtLeast version "4.0" && versionOlder version "4.6") ''
-    NFSD_PNFS y
+    NFSD_PNFS? y
   ''}
-  NFSD_V2_ACL y
-  NFSD_V3 y
-  NFSD_V3_ACL y
-  NFSD_V4 y
+  NFSD_V2_ACL? y
+  NFSD_V3? y
+  NFSD_V3_ACL? y
+  NFSD_V4? y
   ${optionalString (versionAtLeast version "3.11") ''
-    NFSD_V4_SECURITY_LABEL y
+    NFSD_V4_SECURITY_LABEL? y
   ''}
-  NFS_FSCACHE y
-  NFS_SWAP y
-  NFS_V3_ACL y
+  NFS_FSCACHE? y
+  NFS_SWAP? y
+  NFS_V3_ACL? y
   ${optionalString (versionAtLeast version "3.11") ''
-    NFS_V4_1 y  # NFSv4.1 client support
-    NFS_V4_2 y
-    NFS_V4_SECURITY_LABEL y
+    NFS_V4_1? y  # NFSv4.1 client support
+    NFS_V4_2? y
+    NFS_V4_SECURITY_LABEL? y
   ''}
-  CIFS_XATTR y
-  CIFS_POSIX y
-  CIFS_FSCACHE y
-  CIFS_STATS y
-  CIFS_WEAK_PW_HASH y
-  CIFS_UPCALL y
-  CIFS_ACL y
-  CIFS_DFS_UPCALL y
+  CIFS_XATTR? y
+  CIFS_POSIX? y
+  CIFS_FSCACHE? y
+  CIFS_STATS? y
+  CIFS_WEAK_PW_HASH? y
+  CIFS_UPCALL? y
+  CIFS_ACL? y
+  CIFS_DFS_UPCALL? y
   ${optionalString (versionOlder version "4.13") ''
-    CIFS_SMB2 y
+    CIFS_SMB2? y
   ''}
   ${optionalString (versionAtLeast version "3.12") ''
-    CEPH_FSCACHE y
+    CEPH_FSCACHE? y
   ''}
   ${optionalString (versionAtLeast version "3.14") ''
-    CEPH_FS_POSIX_ACL y
+    CEPH_FS_POSIX_ACL? y
   ''}
   ${optionalString (versionAtLeast version "3.13") ''
-    SQUASHFS_FILE_DIRECT y
-    SQUASHFS_DECOMP_MULTI_PERCPU y
+    SQUASHFS_FILE_DIRECT? y
+    SQUASHFS_DECOMP_MULTI_PERCPU? y
   ''}
-  SQUASHFS_XATTR y
-  SQUASHFS_ZLIB y
-  SQUASHFS_LZO y
-  SQUASHFS_XZ y
+  SQUASHFS_XATTR? y
+  SQUASHFS_ZLIB? y
+  SQUASHFS_LZO? y
+  SQUASHFS_XZ? y
   ${optionalString (versionAtLeast version "3.19") ''
-    SQUASHFS_LZ4 y
+    SQUASHFS_LZ4? y
   ''}
 
   # Native Language Support modules, needed by some filesystems
-  NLS y
-  NLS_DEFAULT utf8
-  NLS_UTF8 m
-  NLS_CODEPAGE_437 m # VFAT default for the codepage= mount option
-  NLS_ISO8859_1 m    # VFAT default for the iocharset= mount option
+  NLS? y
+  NLS_DEFAULT? utf8
+  NLS_UTF8? m
+  NLS_CODEPAGE_437? m # VFAT default for the codepage= mount option
+  NLS_ISO8859_1? m    # VFAT default for the iocharset= mount option
 
   # Runtime security tests
   ${optionalString (versionOlder version "4.11") ''
@@ -404,7 +404,7 @@ with stdenv.lib;
   ${optionalString (versionAtLeast version "4.3") ''
     IDLE_PAGE_TRACKING y
   ''}
-  IRDA_ULTRA y # Ultra (connectionless) protocol
+  IRDA_ULTRA? y # Ultra (connectionless) protocol
   JOYSTICK_IFORCE_232? y # I-Force Serial joysticks and wheels
   JOYSTICK_IFORCE_USB? y # I-Force USB joysticks and wheels
   JOYSTICK_XPAD_FF? y # X-Box gamepad rumble support
@@ -414,7 +414,7 @@ with stdenv.lib;
   LDM_PARTITION y # Windows Logical Disk Manager (Dynamic Disk) support
   LOGIRUMBLEPAD2_FF y # Logitech Rumblepad 2 force feedback
   LOGO n # not needed
-  MEDIA_ATTACH y
+  MEDIA_ATTACH? y
   MEGARAID_NEWGEN y
   ${optionalString (versionAtLeast version "3.15" && versionOlder version "4.8") ''
     MLX4_EN_VXLAN y
@@ -508,7 +508,7 @@ with stdenv.lib;
   DEVTMPFS y
 
   # Easier debugging of NFS issues.
-  SUNRPC_DEBUG y
+  SUNRPC_DEBUG? y
 
   # Virtualisation.
   PARAVIRT? y
@@ -527,13 +527,13 @@ with stdenv.lib;
   ${optionalString (versionAtLeast version "4.0") ''
     KVM_GENERIC_DIRTYLOG_READ_PROTECT y
   ''}
-  KVM_GUEST y
-  KVM_MMIO y
+  KVM_GUEST n
+  KVM_MMIO n
   ${optionalString (versionAtLeast version "3.13") ''
     KVM_VFIO y
   ''}
   ${optionalString (stdenv.isx86_64 || stdenv.isi686) ''
-    XEN? y
+    XEN? n
     XEN_DOM0? y
     ${optionalString ((versionAtLeast version "3.18") && (features.xen_dom0 or false))  ''
       PCI_XEN? y
@@ -566,18 +566,18 @@ with stdenv.lib;
   VIRT_DRIVERS y
 
   # Media support.
-  MEDIA_DIGITAL_TV_SUPPORT y
-  MEDIA_CAMERA_SUPPORT y
+  MEDIA_DIGITAL_TV_SUPPORT? n
+  MEDIA_CAMERA_SUPPORT? y
   ${optionalString (versionOlder version "4.14") ''
-    MEDIA_RC_SUPPORT y
+    MEDIA_RC_SUPPORT? y
   ''}
-  MEDIA_CONTROLLER y
-  MEDIA_USB_SUPPORT y
-  MEDIA_PCI_SUPPORT y
-  MEDIA_ANALOG_TV_SUPPORT y
-  VIDEO_STK1160_COMMON m
+  MEDIA_CONTROLLER? y
+  MEDIA_USB_SUPPORT? y
+  MEDIA_PCI_SUPPORT? y
+  MEDIA_ANALOG_TV_SUPPORT? y
+  VIDEO_STK1160_COMMON? m
   ${optionalString (versionOlder version "4.11") ''
-    VIDEO_STK1160_AC97 y
+    VIDEO_STK1160_AC97? y
   ''}
 
   # Our initrd init uses shebang scripts, so can't be modular.
