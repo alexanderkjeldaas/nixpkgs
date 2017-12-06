@@ -5963,6 +5963,8 @@ with pkgs;
 
   hop = callPackage ../development/compilers/hop { };
 
+  rocm-device-libs = callPackage ../development/libraries/rocm-device-libs { };
+
   falcon = callPackage ../development/interpreters/falcon { };
 
   fsharp = callPackage ../development/compilers/fsharp { };
