@@ -4,7 +4,7 @@
 , bzip2, openldap, readline, libelf, uwimap, binutils, cyrus_sasl, pam, libpng
 , libxslt, freetype, gdb, git, perl, mariadb, gmp, libyaml, libedit
 , libvpx, imagemagick, fribidi, gperf, which, ocamlPackages
-, linux_4_11_kfd
+, roct, hsa-runtime-amd
 }:
 
 stdenv.mkDerivation rec {
@@ -35,14 +35,14 @@ stdenv.mkDerivation rec {
 #  dontUseCmakeBuildDir = true;
 #  NIX_LDFLAGS = "-lpam -L${pam}/lib";
 
-  NIX_CFLAGS_COMIPLE = "-I${linux_4_11_kfd.source}/drivers";
+#  NIX_CFLAGS_COMIPLE = "-I${linux_4_11_kfd.source}/drivers";
   # work around broken build system
 #  NIX_CFLAGS_COMPILE = "-I${freetype.dev}/include/freetype2";
 
   # the cmake package does not handle absolute CMAKE_INSTALL_INCLUDEDIR correctly
   # (setting it to an absolute path causes include files to go to $out/$out/include,
   #  because the absolute path is interpreted with root at $out).
-  cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-I${linux_4_11_kfd.source}/drivers";
+  cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-I${roct}/include -DHSA_HEADER_DIR=${hsa-runtime-amd}/include -DHSA_LIBRARY_DIR=${hsa-runtime-amd}/lib";
 
 #  prePatch = ''
 #    substituteInPlace ./configure \
