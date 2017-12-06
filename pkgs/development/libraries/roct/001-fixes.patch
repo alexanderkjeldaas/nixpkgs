@@ -1,0 +1,21 @@
+diff -ur ROCT-Thunk-Interface-25a9bc2/src/perfctr.c ROCT-Thunk-Interface-25a9bc2.new/src/perfctr.c
+--- ROCT-Thunk-Interface-25a9bc2/src/perfctr.c	1970-01-01 01:00:01.000000000 +0100
++++ ROCT-Thunk-Interface-25a9bc2.new/src/perfctr.c	2017-12-06 22:30:33.011488936 +0100
+@@ -151,7 +151,7 @@
+ 
+ 	if (shmem_fd > 0)
+ 		shm_unlink(shmem_name);
+-	if (sem && sem != SEM_FAILED) {
++	if (sem != SEM_FAILED) {
+ 		sem_close(sem);
+ 		sem_unlink(sem_name);
+ 	}
+@@ -320,7 +320,7 @@
+ 
+ 	if (shmem_fd <= 0)
+ 		return HSAKMT_STATUS_UNAVAILABLE;
+-	if (!sem || sem == SEM_FAILED)
++	if (sem == SEM_FAILED)
+ 		return HSAKMT_STATUS_UNAVAILABLE;
+ 
+ 	sem_wait(sem);

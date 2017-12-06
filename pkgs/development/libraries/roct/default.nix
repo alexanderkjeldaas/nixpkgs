@@ -4,7 +4,7 @@
 , bzip2, openldap, readline, libelf, uwimap, binutils, cyrus_sasl, pam, libpng
 , libxslt, freetype, gdb, git, perl, mariadb, gmp, libyaml, libedit
 , libvpx, imagemagick, fribidi, gperf, which, ocamlPackages
-, linux_4_11_kfd
+, pciutils
 }:
 
 stdenv.mkDerivation rec {
@@ -23,25 +23,21 @@ stdenv.mkDerivation rec {
     [ cmake pkgconfig libunwind
     ];
 
-#  patches = [
-#    ./flexible-array-members-gcc6.patch
-#    (fetchurl {
-#      url = https://github.com/facebook/hhvm/commit/b506902af2b7c53de6d6c92491c2086472292004.patch;
-#      sha256 = "1br7diczqks6b1xjrdsac599fc62m9l17gcx7dvkc0qj54lq7ys4";
-#    })
-#  ];
+  patches = [
+    ./001-fixes.patch
+  ];
 
   enableParallelBuilding = true;
 #  dontUseCmakeBuildDir = true;
-#  NIX_LDFLAGS = "-lpam -L${pam}/lib";
+  NIX_LDFLAGS = "-L${pciutils}/lib";
 
   # work around broken build system
-  NIX_CFLAGS_COMPILE = "-I${linux_4_11_kfd.src}/drivers";
+  NIX_CFLAGS_COMPILE = "-I${pciutils}/include";
 
   # the cmake package does not handle absolute CMAKE_INSTALL_INCLUDEDIR correctly
   # (setting it to an absolute path causes include files to go to $out/$out/include,
   #  because the absolute path is interpreted with root at $out).
-  cmakeFlags = "-DCMAKE_BUILD_TYPE=Release";
+  cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DCMAKE_CFLAGS=-I${pciutils}/include";
 
 #  prePatch = ''
 #    substituteInPlace ./configure \
