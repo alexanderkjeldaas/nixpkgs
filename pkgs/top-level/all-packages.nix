@@ -5955,6 +5955,10 @@ with pkgs;
 
   hhvm = callPackage ../development/compilers/hhvm { };
 
+  hcc = callPackage ../development/compilers/hcc { };
+
+  roct = callPackage ../development/libraries/roct { };
+
   hop = callPackage ../development/compilers/hop { };
 
   falcon = callPackage ../development/interpreters/falcon { };
