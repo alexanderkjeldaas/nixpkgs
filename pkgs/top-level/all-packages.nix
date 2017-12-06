@@ -5959,6 +5959,8 @@ with pkgs;
 
   roct = callPackage ../development/libraries/roct { };
 
+  hsa-runtime-amd = callPackage ../development/libraries/hsa-runtime-amd { };
+
   hop = callPackage ../development/compilers/hop { };
 
   falcon = callPackage ../development/interpreters/falcon { };
