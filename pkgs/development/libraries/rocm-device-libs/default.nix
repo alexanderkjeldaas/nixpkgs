@@ -4,7 +4,7 @@
 
 
 stdenv.mkDerivation rec {
-  name    = "roct-${version}";
+  name    = "rocm-device-libs-${version}";
   version = "roc-1.6.x";
 
   llvm = stdenv.mkDerivation rec {
