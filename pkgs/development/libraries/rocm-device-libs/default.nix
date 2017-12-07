@@ -1,5 +1,5 @@
 { stdenv, fetchgit, cmake, pkgconfig
-, python
+, python, zlib, ncurses
 }:
 
 
@@ -7,26 +7,46 @@ stdenv.mkDerivation rec {
   name    = "roct-${version}";
   version = "roc-1.6.x";
 
-  llvm = fetchgit {
-    url    = "https://github.com/RadeonOpenCompute/llvm.git";
-    rev    = "0816ab310423f59b9a7ba050a7f6748541ea17ec"; # "amd-common";
-    sha256 = "1p85nqcfl0839z6xy226sldxfl02indq5fjq59461g2j08pjwf9h";
-    fetchSubmodules = true;
+  llvm = stdenv.mkDerivation rec {
+    name = "roct-llvm";
+    
+    src = fetchgit {
+      url    = "https://github.com/RadeonOpenCompute/llvm.git";
+      rev    = "0816ab310423f59b9a7ba050a7f6748541ea17ec"; # "amd-common";
+      sha256 = "1p85nqcfl0839z6xy226sldxfl02indq5fjq59461g2j08pjwf9h";
+      fetchSubmodules = true;
+    };
+
+    lld = fetchgit {
+      url    = "https://github.com/RadeonOpenCompute/lld.git";
+      rev    = "0b421068c2eb848a62fd2f241291c9098333aeeb";  # "amd-common";
+      sha256 = "108akwp1d1z16rcrfpvqa3k0366shrj262mn0j16x10aqgfsansy";
+      fetchSubmodules = true;
+    };
+  
+    clang = fetchgit {
+      url    = "https://github.com/RadeonOpenCompute/clang.git";
+      rev    = "5b6ff13096fa9cd51c53af347c2dcadc849bbbaf"; #"amd-common";
+      sha256 = "0ziz05am6xmjdz6qa7sgd4wikr5wzr1psr9040r9k88hdvvakmcc";
+      fetchSubmodules = true;
+    };
+
+    prePatch = ''
+      chmod 777 tools
+      cp -r ${lld}  tools/lld
+      cp -r ${clang}  tools/clang
+      chmod 777 -R .
+    '';
+
+    parallelBuild = true;
+
+    buildInputs = [ cmake pkgconfig python zlib ncurses ];
+
+
+    enableParallelBuilding = true;
+    cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD='AMDGPU;X86'";
   };
 
-  lld = fetchgit {
-    url    = "https://github.com/RadeonOpenCompute/lld.git";
-    rev    = "0b421068c2eb848a62fd2f241291c9098333aeeb";  # "amd-common";
-    sha256 = "108akwp1d1z16rcrfpvqa3k0366shrj262mn0j16x10aqgfsansy";
-    fetchSubmodules = true;
-  };
-
-  clang = fetchgit {
-    url    = "https://github.com/RadeonOpenCompute/clang.git";
-    rev    = "5b6ff13096fa9cd51c53af347c2dcadc849bbbaf"; #"amd-common";
-    sha256 = "0ziz05am6xmjdz6qa7sgd4wikr5wzr1psr9040r9k88hdvvakmcc";
-    fetchSubmodules = true;
-  };
 
   src = fetchgit {
     url    = "https://github.com/RadeonOpenCompute/ROCm-Device-Libs.git";
@@ -35,17 +55,7 @@ stdenv.mkDerivation rec {
     fetchSubmodules = true;
   };
 
-  prePatch = ''
-    pwd
-    cp -r ${llvm}/  llvm_amd-common
-    chmod 777 llvm_amd-common/tools
-    cp -r ${lld}  llvm_amd-common/tools/lld
-    cp -r ${clang}  llvm_amd-common/tools/clang
-    chmod 777 -R .
-    cd llvm_amd-common
-  '';
 
-  parallelBuild = true;
 
   buildInputs =
     [ cmake pkgconfig python
@@ -62,20 +72,8 @@ stdenv.mkDerivation rec {
   # the cmake package does not handle absolute CMAKE_INSTALL_INCLUDEDIR correctly
   # (setting it to an absolute path causes include files to go to $out/$out/include,
   #  because the absolute path is interpreted with root at $out).
-  cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD='AMDGPU;X86'";
-
-#  prePatch = ''
-#    substituteInPlace ./configure \
-#      --replace "/usr/bin/env bash" ${stdenv.shell}
-#    substituteInPlace ./third-party/ocaml/CMakeLists.txt \
-#      --replace "/bin/bash" ${stdenv.shell}
-#    perl -pi -e 's/([ \t(])(isnan|isinf)\(/$1std::$2(/g' \
-#      hphp/runtime/base/*.cpp \
-#      hphp/runtime/ext/std/*.cpp \
-#      hphp/runtime/ext_zend_compat/php-src/main/*.cpp \
-#      hphp/runtime/ext_zend_compat/php-src/main/*.h
-#    patchShebangs .
-#  '';
+  cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DLLVM_DIR=${llvm}";
+  CC= "${llvm}/bin/clang";
 
   meta = {
     description = "HCC : An open source C++ compiler for heterogeneous devices";
