@@ -5965,6 +5965,8 @@ with pkgs;
 
   rocm-device-libs = callPackage ../development/libraries/rocm-device-libs { };
 
+  rocr-runtime = callPackage ../development/libraries/rocr-runtime { };
+
   falcon = callPackage ../development/interpreters/falcon { };
 
   fsharp = callPackage ../development/compilers/fsharp { };

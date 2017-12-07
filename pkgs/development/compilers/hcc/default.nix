@@ -1,10 +1,7 @@
 { stdenv, fetchgit, fetchurl, cmake, pkgconfig, boost, libunwind, libmemcached
-, pcre, libevent, gd, curl, libxml2, icu, flex, bison, openssl, zlib, php
-, expat, libcap, oniguruma, libdwarf, libmcrypt, tbb, gperftools, glog, libkrb5
-, bzip2, openldap, readline, libelf, uwimap, binutils, cyrus_sasl, pam, libpng
-, libxslt, freetype, gdb, git, perl, mariadb, gmp, libyaml, libedit
-, libvpx, imagemagick, fribidi, gperf, which, ocamlPackages
-, roct, hsa-runtime-amd
+, roct, hsa-runtime-amd, rocm-device-libs
+, rocr-runtime
+, python
 }:
 
 stdenv.mkDerivation rec {
@@ -20,7 +17,8 @@ stdenv.mkDerivation rec {
   };
 
   buildInputs =
-    [ cmake pkgconfig libunwind
+    [ cmake pkgconfig libunwind roct hsa-runtime-amd rocm-device-libs
+      python
     ];
 
 #  patches = [
@@ -37,12 +35,12 @@ stdenv.mkDerivation rec {
 
 #  NIX_CFLAGS_COMIPLE = "-I${linux_4_11_kfd.source}/drivers";
   # work around broken build system
-#  NIX_CFLAGS_COMPILE = "-I${freetype.dev}/include/freetype2";
+  NIX_CFLAGS_COMPILE = "-I${roct}/include:${libunwind.src}/include:${rocr-runtime}/include";
 
   # the cmake package does not handle absolute CMAKE_INSTALL_INCLUDEDIR correctly
   # (setting it to an absolute path causes include files to go to $out/$out/include,
   #  because the absolute path is interpreted with root at $out).
-  cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-I${roct}/include -DHSA_HEADER_DIR=${hsa-runtime-amd}/include -DHSA_LIBRARY_DIR=${hsa-runtime-amd}/lib";
+  cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-I${roct}/include:${libunwind.src}/include:${rocr-runtime}/include -DHSA_HEADER_DIR=${rocr-runtime}/include -DHSA_LIBRARY_DIR=${rocr-runtime}/lib";
 
 #  prePatch = ''
 #    substituteInPlace ./configure \
