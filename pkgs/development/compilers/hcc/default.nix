@@ -33,14 +33,20 @@ stdenv.mkDerivation rec {
 #  dontUseCmakeBuildDir = true;
 #  NIX_LDFLAGS = "-lpam -L${pam}/lib";
 
-#  NIX_CFLAGS_COMIPLE = "-I${linux_4_11_kfd.source}/drivers";
+#  NIX_CFLAGS_COMPILE = "-I${linux_4_11_kfd.source}/drivers";
   # work around broken build system
-  NIX_CFLAGS_COMPILE = "-I${roct}/include:${libunwind.src}/include:${rocr-runtime}/include";
+#  NIX_CFLAGS_COMPILE = "-I${roct}/include -I${libunwind.dev}/include -I${rocr-runtime}/include";
 
   # the cmake package does not handle absolute CMAKE_INSTALL_INCLUDEDIR correctly
   # (setting it to an absolute path causes include files to go to $out/$out/include,
   #  because the absolute path is interpreted with root at $out).
-  cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-I${roct}/include:${libunwind.src}/include:${rocr-runtime}/include -DHSA_HEADER_DIR=${rocr-runtime}/include -DHSA_LIBRARY_DIR=${rocr-runtime}/lib";
+  CMAKE_CXX_FLAGS="-I${roct}/include -I${libunwind.dev}/include";
+  cmakeFlags = ''-DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_BUILD_TYPE=Release -DHSA_HEADER_DIR=${rocr-runtime}/include -DHSA_LIBRARY_DIR=${rocr-runtime}/lib'';
+
+  # Ultra-hack. I'm clueless on how to inform CMake
+  prePatch = ''
+    ln -s ${libunwind.dev}/include/libunwind.h  rocdl/ocml/inc/libunwind.h
+  '';
 
 #  prePatch = ''
 #    substituteInPlace ./configure \
