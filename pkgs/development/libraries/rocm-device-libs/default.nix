@@ -58,7 +58,7 @@ stdenv.mkDerivation rec {
 
 
   buildInputs =
-    [ cmake pkgconfig python
+    [ cmake pkgconfig python zlib ncurses
     ];
 
 
