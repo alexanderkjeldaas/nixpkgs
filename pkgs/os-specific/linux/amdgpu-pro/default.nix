@@ -118,7 +118,7 @@ in stdenv.mkDerivation rec {
     cp -r share $out/share
     popd
 
-    pushd opt/amdgpu
+    pushd opt/amdgpu-pro
   '' + optionalString (!stdenv.is64bit) ''
     cp -r bin $out/bin
   '' + ''
