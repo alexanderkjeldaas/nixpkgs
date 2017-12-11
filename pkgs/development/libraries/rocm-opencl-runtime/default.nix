@@ -3,6 +3,7 @@
 , rocr-runtime
 , cacert
 , mesa
+, x11
 }:
 
 stdenv.mkDerivation rec {
@@ -26,7 +27,7 @@ stdenv.mkDerivation rec {
 
 
   buildInputs =
-    [ cmake pkgconfig roct libelf python git mesa
+    [ cmake pkgconfig roct libelf python git mesa x11
     ];
 
   prePatch = "cd opencl;";
@@ -38,7 +39,7 @@ stdenv.mkDerivation rec {
   # the cmake package does not handle absolute CMAKE_INSTALL_INCLUDEDIR correctly
   # (setting it to an absolute path causes include files to go to $out/$out/include,
   #  because the absolute path is interpreted with root at $out).
-  cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DROCR_INCLUDE_DIR=${rocr-runtime}/src/inc -DROCR_LIBRARY=${rocr-runtime}/lib"; # -DCMAKE_CXX_FLAGS=-I${roct}/include:${libelf}/include";
+  cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DROCR_INCLUDE_DIR=${rocr-runtime}/include/hsa -DROCR_LIBRARY=${rocr-runtime}/lib"; # -DCMAKE_CXX_FLAGS=-I${roct}/include:${libelf}/include";
 
 
   meta = {
