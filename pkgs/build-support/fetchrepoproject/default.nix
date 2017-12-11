@@ -2,6 +2,7 @@
 
 { name, manifest, rev ? "HEAD", sha256
 # Optional parameters:
+, manifestName ? "default.xml"
 , repoRepoURL ? "", repoRepoRev ? "", referenceDir ? ""
 , localManifests ? [], createMirror ? false, useArchive ? false
 }:
@@ -21,6 +22,7 @@ let
   repoInitFlags = [
     "--manifest-url=${manifest}"
     "--manifest-branch=${rev}"
+    "--manifest-name=${manifestName}"
     "--depth=1"
     (optionalString createMirror "--mirror")
     (optionalString useArchive "--archive")
