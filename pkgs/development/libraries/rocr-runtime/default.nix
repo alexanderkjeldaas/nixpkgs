@@ -30,6 +30,10 @@ stdenv.mkDerivation rec {
   #  because the absolute path is interpreted with root at $out).
   cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-I${roct}/include:${libelf}/include";
 
+  postInstall = ''
+    ln -s src/inc $out/include
+  '';
+
 
   meta = {
     description = "ROC Runtime source code based on the HSA Runtime but modified to support AMD/ATI discrete GPUs.";
