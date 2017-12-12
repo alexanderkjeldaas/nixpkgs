@@ -27,8 +27,10 @@ stdenv.mkDerivation rec {
 
 
   buildInputs =
-    [ cmake pkgconfig roct libelf python git mesa x11
+    [ cmake pkgconfig roct libelf python git mesa x11 rocr-runtime
     ];
+
+  patches = [ ./01-find-hsakmt-library.patch ];
 
   prePatch = "cd opencl;";
   GIT_SSL_CAINFO="/etc/ssl/certs/ca-certificates.crt";
@@ -39,7 +41,10 @@ stdenv.mkDerivation rec {
   # the cmake package does not handle absolute CMAKE_INSTALL_INCLUDEDIR correctly
   # (setting it to an absolute path causes include files to go to $out/$out/include,
   #  because the absolute path is interpreted with root at $out).
-  cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DROCR_INCLUDE_DIR=${rocr-runtime}/include/hsa -DROCR_LIBRARY=${rocr-runtime}/lib"; # -DCMAKE_CXX_FLAGS=-I${roct}/include:${libelf}/include";
+  ROCR_LIBRARY="-lhsa-runtime64";
+  HSAKMT_LIBRARY="-lhsakmt";
+  #cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DROCR_INCLUDE_DIR=${rocr-runtime}/include/hsa -DROCR_LIBRARY=${rocr-runtime}/lib"; # -DCMAKE_CXX_FLAGS=-I${roct}/include:${libelf}/include";
+  cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DROCR_INCLUDE_DIR=${rocr-runtime}/include/hsa"; # -DCMAKE_CXX_FLAGS=-I${roct}/include:${libelf}/include";
 
 
   meta = {

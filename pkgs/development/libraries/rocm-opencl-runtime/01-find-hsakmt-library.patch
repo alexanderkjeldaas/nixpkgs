@@ -1,0 +1,19 @@
+diff -ur ROCm-OpenCL-Runtime/opencl/cmake/modules/FindROCR.cmake ROCm-OpenCL-Runtime.new/opencl/cmake/modules/FindROCR.cmake
+--- opencl/cmake/modules/FindROCR.cmake	2017-12-12 13:30:21.218940102 +0100
++++ opencl.new/cmake/modules/FindROCR.cmake	2017-12-12 15:09:58.471829086 +0100
+@@ -11,6 +11,8 @@
+ find_library(ROCR_LIBRARY hsa-runtime64
+              HINTS /var/empty/rocm/lib  /var/empty/rocm/hsa/lib)
+ 
++find_library(HSAKMT_LIBRARY hsakmt)
++
+ include(FindPackageHandleStandardArgs)
+ # handle the QUIETLY and REQUIRED arguments and set ROCR_FOUND to TRUE
+ # if all listed variables are TRUE
+@@ -19,5 +21,5 @@
+ 
+ mark_as_advanced(ROCR_INCLUDE_DIR ROCR_LIBRARY)
+ 
+-set(ROCR_LIBRARIES ${ROCR_LIBRARY})
++set(ROCR_LIBRARIES ${ROCR_LIBRARY} ${HSAKMT_LIBRARY})
+ set(ROCR_INCLUDE_DIRS ${ROCR_INCLUDE_DIR})
