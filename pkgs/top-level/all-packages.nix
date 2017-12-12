@@ -5969,6 +5969,8 @@ with pkgs;
 
   rocm-opencl-runtime = callPackage ../development/libraries/rocm-opencl-runtime { };
 
+  roc-smi = callPackage ../os-specific/linux/roc-smi { };
+
   falcon = callPackage ../development/interpreters/falcon { };
 
   fsharp = callPackage ../development/compilers/fsharp { };
