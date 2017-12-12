@@ -15,12 +15,12 @@ stdenv.mkDerivation rec {
     name = "ROCm-OpenCL-Runtime";
 #    url    = "https://github.com/RadeonOpenCompute/ROCm-OpenCL-Runtime.git";
 #    rev    = "roc-1.7.x"; #5c209b3df0d7ebeedcf803471ab22f36b49b1cee";
-    rev    = "master"; #5c209b3df0d7ebeedcf803471ab22f36b49b1cee";
+    rev    = "cc77105f58e5096ff81afe4d1992c6bde3545fff"; #"master"; #5c209b3df0d7ebeedcf803471ab22f36b49b1cee";
     manifest    = "https://github.com/RadeonOpenCompute/ROCm-OpenCL-Runtime.git";
     manifestName = "opencl.xml";
 #    manifest = "opencl.xml";
 #    manifest = "https://raw.githubusercontent.com/RadeonOpenCompute/ROCm-OpenCL-Runtime/roc-1.6.x/opencl.xml/"
-    sha256 = "1j0cqsqm9lyi4lyljddridp8x6iarhcj3zydfdlzlf9qvinvbda9";
+    sha256 = "1pqixvjn49r509yjyjmlqdn4idqrvd6kn0jv5j7g9rbx4ilp91gd";
   };
 
 #  phases = [ "unpackPhase" "installPhase"];
