@@ -32,7 +32,10 @@ stdenv.mkDerivation rec {
 
   patches = [ ./01-find-hsakmt-library.patch ];
 
-  prePatch = "cd opencl;";
+  prePatch = ''
+    cd opencl;
+    sed -i 's,/etc/OpenCL/vendors,'$out'/etc/OpenCL/vendors,g' ./api/opencl/khronos/icd/icd_linux.c
+  '';
   GIT_SSL_CAINFO="/etc/ssl/certs/ca-certificates.crt";
   SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt";
 
@@ -46,6 +49,10 @@ stdenv.mkDerivation rec {
   #cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DROCR_INCLUDE_DIR=${rocr-runtime}/include/hsa -DROCR_LIBRARY=${rocr-runtime}/lib"; # -DCMAKE_CXX_FLAGS=-I${roct}/include:${libelf}/include";
   cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DROCR_INCLUDE_DIR=${rocr-runtime}/include/hsa"; # -DCMAKE_CXX_FLAGS=-I${roct}/include:${libelf}/include";
 
+  postInstall = ''
+    mkdir -p $out/etc/OpenCL/vendors
+    cp ./api/opencl/config/amdocl64.icd $out/etc/OpenCL/vendors
+  '';
 
   meta = {
     description = "ROCm OpenCL™ Compatible Runtime.";
