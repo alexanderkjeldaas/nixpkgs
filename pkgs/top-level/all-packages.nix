@@ -16841,8 +16841,6 @@ with pkgs;
 
   xst = callPackage ../applications/misc/st/xst.nix { };
 
-  xmr-stak = callPackage ../applications/misc/xmr-stak { };
-  
   amdgpu-pro = callPackage ../os-specific/linux/amdgpu-pro { libsOnly = true; };
 
 

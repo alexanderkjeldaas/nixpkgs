@@ -3,7 +3,10 @@
 , devDonationLevel ? "0.0"
 , cudaSupport ? false
 , openclSupport ? false
-, amdgpu-pro, proot }:
+, amdSupport ? false
+, amdgpu-pro, proot
+, rocm-opencl-runtime
+, makeWrapper
 }:
 
 stdenv.mkDerivation rec {
@@ -21,11 +24,14 @@ stdenv.mkDerivation rec {
 
   cmakeFlags = lib.optional (!cudaSupport) "-DCUDA_ENABLE=OFF"
     ++ lib.optional (!openclSupport) "-DOpenCL_ENABLE=OFF";
+    ++ lib.optional amdSupport " -DOpenCL_LIBRARY=${rocm-opencl-runtime}/lib -DOpenCL_INCLUDE_DIR=${rocm-opencl-runtime}/include/opencl2.2";
 
-  nativeBuildInputs = [ cmake ];
-  buildInputs = [ libmicrohttpd openssl hwloc ]
+  nativeBuildInputs = [ cmake rocm-opencl-runtime ];
+  buildInputs = [ libmicrohttpd openssl hwloc makeWrapper ]
     ++ lib.optional cudaSupport cudatoolkit
-    ++ lib.optionals openclSupport [ opencl-headers ocl-icd ];
+    ++ lib.optionals openclSupport [ opencl-headers ocl-icd ]
+    ++ lib.optional amdSupport rocm-opencl-runtime;
+
 
   postPatch = ''
     substituteInPlace xmrstak/donate-level.hpp \
@@ -38,6 +44,13 @@ stdenv.mkDerivation rec {
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ fpletz ];
   };
+
+  postInstall = ''
+
+    mv $out/bin/xmr-stak $out/bin/xmr-stak.bin
+      
+    makeWrapper $out/bin/xmr-stak.bin $out/bin/xmr-stak --set LD_LIBRARY_PATH $out/bin:${rocm-opencl-runtime}/lib --set LD_PRELOAD libOpenCL.so.1.2
+  '';
   #postInstall =
   #    ''
   #    echo '#!/bin/sh' >> $out/bin/xmr-stak.sh
