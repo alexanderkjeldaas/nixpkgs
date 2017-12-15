@@ -4,6 +4,7 @@
 , cacert
 , mesa
 , x11
+, makeWrapper
 }:
 
 stdenv.mkDerivation rec {
@@ -27,7 +28,7 @@ stdenv.mkDerivation rec {
 
 
   buildInputs =
-    [ cmake pkgconfig roct libelf python git mesa x11 rocr-runtime
+    [ cmake pkgconfig roct libelf python git mesa x11 rocr-runtime makeWrapper
     ];
 
   patches = [ ./01-find-hsakmt-library.patch ];
@@ -51,7 +52,14 @@ stdenv.mkDerivation rec {
 
   postInstall = ''
     mkdir -p $out/etc/OpenCL/vendors
-    cp ./api/opencl/config/amdocl64.icd $out/etc/OpenCL/vendors
+    cp ../api/opencl/config/amdocl64.icd $out/etc/OpenCL/vendors
+
+    ln -s libOpenCL.so.1.2 $out/lib/libOpenCL.so.1
+    mv $out/lib/libamdocl64.so $out/lib/libamdocl64.so.1
+    ln -s libamdocl64.so.1 $out/lib/libamdocl64.so
+
+    mv $out/bin/clinfo $out/bin/clinfo.bin
+    makeWrapper $out/bin/clinfo.bin $out/bin/clinfo --set LD_LIBRARY_PATH ${rocr-runtime}/lib:${roct}/lib --set LD_PRELOAD libOpenCL.so.1.2:libhsa-runtime64.so.1:libhsakmt.so
   '';
 
   meta = {
