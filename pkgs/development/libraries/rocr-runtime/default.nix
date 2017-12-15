@@ -32,6 +32,8 @@ stdenv.mkDerivation rec {
 
   postInstall = ''
     ln -s src/inc $out/include
+    mv $out/lib/libhsa-runtime64.so $out/lib/libhsa-runtime64.so.1
+    ln -s libhsa-runtime64.so.1 $out/lib/libhsa-runtime64.so
   '';
 
 
