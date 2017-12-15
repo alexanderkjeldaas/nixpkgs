@@ -12676,6 +12676,21 @@ with pkgs;
     ];
   };
 
+  linux_4_14_kfd = callPackage ../os-specific/linux/kernel/linux-4.14-kfd.nix {
+    kernelPatches =
+      [ kernelPatches.bridge_stp_helper
+        # See pkgs/os-specific/linux/kernel/cpu-cgroup-v2-patches/README.md
+        # when adding a new linux version
+        kernelPatches.cpu-cgroup-v2."4.11"
+        kernelPatches.modinst_arg_list_too_long
+      ]
+      ++ lib.optionals ((platform.kernelArch or null) == "mips")
+      [ kernelPatches.mips_fpureg_emu
+        kernelPatches.mips_fpu_sigill
+        kernelPatches.mips_ext3_n32
+      ];
+  };
+
   linux_4_11_kfd = callPackage ../os-specific/linux/kernel/linux-4.11-kfd.nix {
     kernelPatches =
       [ kernelPatches.bridge_stp_helper
@@ -12945,6 +12960,7 @@ with pkgs;
   linuxPackages_4_11_kfd = recurseIntoAttrs (linuxPackagesFor pkgs.linux_4_11_kfd);
   linuxPackages_4_13 = recurseIntoAttrs (linuxPackagesFor pkgs.linux_4_13);
   linuxPackages_4_14 = recurseIntoAttrs (linuxPackagesFor pkgs.linux_4_14);
+  linuxPackages_4_14_kfd = recurseIntoAttrs (linuxPackagesFor pkgs.linux_4_14_kfd);
   # Don't forget to update linuxPackages_latest!
 
   # Intentionally lacks recurseIntoAttrs, as -rc kernels will quite likely break out-of-tree modules and cause failed Hydra builds.
