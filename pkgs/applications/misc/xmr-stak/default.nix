@@ -6,6 +6,8 @@
 , amdSupport ? false
 , amdgpu-pro, proot
 , rocm-opencl-runtime
+, rocr-runtime
+, roct
 , makeWrapper
 }:
 
@@ -30,7 +32,9 @@ stdenv.mkDerivation rec {
   buildInputs = [ libmicrohttpd openssl hwloc makeWrapper ]
     ++ lib.optional cudaSupport cudatoolkit
     ++ lib.optionals openclSupport [ opencl-headers ocl-icd ]
-    ++ lib.optional amdSupport rocm-opencl-runtime;
+    ++ lib.optional amdSupport rocm-opencl-runtime
+    ++ lib.optional amdSupport rocr-runtime
+    ++ lib.optional amdSupport roct;
 
 
   postPatch = ''
@@ -49,7 +53,7 @@ stdenv.mkDerivation rec {
 
     mv $out/bin/xmr-stak $out/bin/xmr-stak.bin
       
-    makeWrapper $out/bin/xmr-stak.bin $out/bin/xmr-stak --set LD_LIBRARY_PATH $out/bin:${rocm-opencl-runtime}/lib --set LD_PRELOAD libOpenCL.so.1.2
+    makeWrapper $out/bin/xmr-stak.bin $out/bin/xmr-stak --set LD_LIBRARY_PATH $out/bin:${rocm-opencl-runtime}/lib:${rocr-runtime}/lib:${roct}/lib --set LD_PRELOAD libOpenCL.so.1.2:libhsa-runtime64.so:libhsakmt.so
   '';
   #postInstall =
   #    ''
