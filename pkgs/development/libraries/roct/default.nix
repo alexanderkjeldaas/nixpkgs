@@ -39,18 +39,10 @@ stdenv.mkDerivation rec {
   #  because the absolute path is interpreted with root at $out).
   cmakeFlags = "-DCMAKE_BUILD_TYPE=Release -DCMAKE_CFLAGS=-I${pciutils}/include";
 
-#  prePatch = ''
-#    substituteInPlace ./configure \
-#      --replace "/usr/bin/env bash" ${stdenv.shell}
-#    substituteInPlace ./third-party/ocaml/CMakeLists.txt \
-#      --replace "/bin/bash" ${stdenv.shell}
-#    perl -pi -e 's/([ \t(])(isnan|isinf)\(/$1std::$2(/g' \
-#      hphp/runtime/base/*.cpp \
-#      hphp/runtime/ext/std/*.cpp \
-#      hphp/runtime/ext_zend_compat/php-src/main/*.cpp \
-#      hphp/runtime/ext_zend_compat/php-src/main/*.h
-#    patchShebangs .
-#  '';
+  postInstall = ''
+    mv $out/lib/libhsakmt.so $out/lib/libhsakmt.so.1
+    ln -s libhsakmt.so.1 $out/lib/libhsakmt.so
+  '';
 
   meta = {
     description = "HCC : An open source C++ compiler for heterogeneous devices";
